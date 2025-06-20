@@ -33,26 +33,32 @@
         .value {
             color: #555;
         }
+        .error {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>Máquina 1</h2>
+
         <div class="row">
             <div class="label">Operador:</div>
-            <div class="value operador">{{ datos.operador }}</div>
+            <div class="value" id="operador">{{ datos.operador }}</div>
         </div>
         <div class="row">
             <div class="label">Horas de trabajo:</div>
-            <div class="value horas_trabajo">{{ datos.horas_trabajo }}</div>
+            <div class="value" id="horas_trabajo">{{ datos.horas_trabajo }}</div>
         </div>
         <div class="row">
             <div class="label">Piezas cortadas:</div>
-            <div class="value piezas_cortadas">{{ datos.piezas_cortadas }}</div>
+            <div class="value" id="piezas_cortadas">{{ datos.piezas_cortadas }}</div>
         </div>
         <div class="row">
             <div class="label">Tipo de perfil:</div>
-            <div class="value tipo_perfil">{{ datos.tipo_perfil }}</div>
+            <div class="value" id="tipo_perfil">{{ datos.tipo_perfil }}</div>
         </div>
 
         <!-- ✅ BOTÓN LOG -->
@@ -63,23 +69,27 @@
         </div>
     </div>
 
-    <!-- ✅ Script de actualización cada 15s -->
     <script>
-        function actualizarDatos() {
-            fetch('/api/datos')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) return; // no actualizar si hay error
-
-                    document.querySelector('.operador').textContent = data.operador;
-                    document.querySelector('.horas_trabajo').textContent = data.horas_trabajo;
-                    document.querySelector('.piezas_cortadas').textContent = data.piezas_cortadas;
-                    document.querySelector('.tipo_perfil').textContent = data.tipo_perfil;
+        // 🔁 Refresca automáticamente los valores cada 15 segundos
+        setInterval(() => {
+            fetch("/api/datos")
+                .then(response => {
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return response.json();
                 })
-                .catch(err => console.error('Error actualizando:', err));
-        }
+                .then(data => {
+                    if (data.error) return;
 
-        setInterval(actualizarDatos, 15000); // cada 15 segundos
+                    // Actualiza valores en la página
+                    document.getElementById("operador").innerText = data.operador;
+                    document.getElementById("horas_trabajo").innerText = data.horas_trabajo;
+                    document.getElementById("piezas_cortadas").innerText = data.piezas_cortadas;
+                    document.getElementById("tipo_perfil").innerText = data.tipo_perfil;
+                })
+                .catch(err => {
+                    console.error("Error actualizando:", err);
+                });
+        }, 15000);  // 15000ms = 15s
     </script>
 </body>
 </html>
