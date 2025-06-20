@@ -19,6 +19,10 @@ def descargar_csv_drive(file_id):
         response = session.get(URL, params=params, stream=True)
 
     content = response.content.decode('utf-8')
+    
+    print("Contenido CSV descargado:")
+    print(content[:500])  # Muestra primeras 500 letras para ver qué descarga
+    
     return pd.read_csv(StringIO(content))
 
 def _get_confirm_token(response):
