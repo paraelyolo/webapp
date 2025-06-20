@@ -29,3 +29,4 @@ def _get_confirm_token(response):
         if key.startswith('download_warning'):
             return value
     return None
+
