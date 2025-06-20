@@ -1,0 +1,5 @@
+
+Puedes crear el botón de logout en cualquier página así:
+
+<a href="{{ url_for('logout') }}">Cerrar sesión</a>
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Máquina 1</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f9f9f9;
+            padding: 40px;
+        }
+        .box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Máquina 1</h2>
+        <div class="row"><div class="label">Operador:</div><div class="value">{{ datos.operador }}</div></div>
+        <div class="row"><div class="label">Horas de trabajo:</div><div class="value">{{ datos.horas }}</div></div>
+        <div class="row"><div class="label">Piezas cortadas:</div><div class="value">{{ datos.piezas }}</div></div>
+        <div class="row"><div class="label">Tipo de perfil:</div><div class="value">{{ datos.perfil }}</div></div>
+    </div>
+</body>
+</html>
+
