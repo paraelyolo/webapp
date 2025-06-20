@@ -33,37 +33,27 @@
         .value {
             color: #555;
         }
-        .error {
-            color: red;
-            text-align: center;
-            margin: 20px 0;
-        }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>Máquina 1</h2>
-
-        {% if datos %}
-            <div class="row">
-                <div class="label">Operador:</div>
-                <div class="value">{{ datos.operador }}</div>
-            </div>
-            <div class="row">
-                <div class="label">Horas de trabajo:</div>
-                <div class="value">{{ datos.horas_trabajo }}</div>
-            </div>
-            <div class="row">
-                <div class="label">Piezas cortadas:</div>
-                <div class="value">{{ datos.piezas_cortadas }}</div>
-            </div>
-            <div class="row">
-                <div class="label">Tipo de perfil:</div>
-                <div class="value">{{ datos.tipo_perfil }}</div>
-            </div>
-        {% else %}
-            <div class="error">No se pudieron cargar los datos del dashboard.</div>
-        {% endif %}
+        <div class="row">
+            <div class="label">Operador:</div>
+            <div class="value operador">{{ datos.operador }}</div>
+        </div>
+        <div class="row">
+            <div class="label">Horas de trabajo:</div>
+            <div class="value horas_trabajo">{{ datos.horas_trabajo }}</div>
+        </div>
+        <div class="row">
+            <div class="label">Piezas cortadas:</div>
+            <div class="value piezas_cortadas">{{ datos.piezas_cortadas }}</div>
+        </div>
+        <div class="row">
+            <div class="label">Tipo de perfil:</div>
+            <div class="value tipo_perfil">{{ datos.tipo_perfil }}</div>
+        </div>
 
         <!-- ✅ BOTÓN LOG -->
         <div style="text-align: center; margin-top: 20px;">
@@ -72,5 +62,24 @@
             </a>
         </div>
     </div>
+
+    <!-- ✅ Script de actualización cada 15s -->
+    <script>
+        function actualizarDatos() {
+            fetch('/api/datos')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) return; // no actualizar si hay error
+
+                    document.querySelector('.operador').textContent = data.operador;
+                    document.querySelector('.horas_trabajo').textContent = data.horas_trabajo;
+                    document.querySelector('.piezas_cortadas').textContent = data.piezas_cortadas;
+                    document.querySelector('.tipo_perfil').textContent = data.tipo_perfil;
+                })
+                .catch(err => console.error('Error actualizando:', err));
+        }
+
+        setInterval(actualizarDatos, 15000); // cada 15 segundos
+    </script>
 </body>
 </html>
