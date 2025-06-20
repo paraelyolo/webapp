@@ -5,12 +5,11 @@ import json
 import os
 
 app = Flask(__name__)
-app.secret_key = 'superclave'  # cámbiala por una clave larga y única en producción
+app.secret_key = 'superclave'
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USERS_FILE = os.path.join(BASE_DIR, 'users.json')
 
-# IDs públicos de archivos CSV en Google Drive
 CSV_IDS = {
     "operador": "1uIgigavolkY6xdWKw1DCEGmfsBD_wzn6",
     "horas_trabajo": "152IQbofX1hAKODLmOU8HJErDHW142hNH",
@@ -19,7 +18,8 @@ CSV_IDS = {
 }
 
 def obtener_valor_primera_celda(df):
-    """Devuelve el valor de la primera celda si existe, o 'Sin datos'."""
+    print("DataFrame recibido:")
+    print(df)
     if df.empty:
         return "Sin datos"
     return df.iloc[0, 0]
@@ -53,16 +53,18 @@ def dashboard():
 
     datos = {}
     errores = []
-
     for clave, file_id in CSV_IDS.items():
         try:
             df = descargar_csv_drive(file_id)
-            app.logger.info(f"Contenido CSV para '{clave}':\n{df}")
+            app.logger.info(f"Contenido CSV para {clave}: \n{df}")
             datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
             error_msg = f"Error en '{clave}': {str(e)}"
             errores.append(error_msg)
             app.logger.error(error_msg)
+
+    print("Datos recopilados:")
+    print(datos)
 
     if errores:
         return "Errores detectados:<br>" + "<br>".join(errores), 500
