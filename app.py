@@ -1,11 +1,11 @@
-from flask import Flask, render_template, redirect, session, request, url_for
+from flask import Flask, render_template, redirect, session, request, url_for, jsonify
 from werkzeug.security import check_password_hash
 from utils.drive import descargar_csv_drive
 import json
 import os
 
 app = Flask(__name__)
-app.secret_key = 'superclave'
+app.secret_key = 'superclave'  # cámbiala por una clave fuerte en producción
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USERS_FILE = os.path.join(BASE_DIR, 'users.json')
@@ -18,8 +18,6 @@ CSV_IDS = {
 }
 
 def obtener_valor_primera_celda(df):
-    print("DataFrame recibido:")
-    print(df)
     if df.empty:
         return "Sin datos"
     return df.iloc[0, 0]
@@ -63,13 +61,27 @@ def dashboard():
             errores.append(error_msg)
             app.logger.error(error_msg)
 
-    print("Datos recopilados:")
-    print(datos)
-
     if errores:
         return "Errores detectados:<br>" + "<br>".join(errores), 500
 
     return render_template('dashboard.html', datos=datos)
+
+# ✅ Nuevo endpoint para refresco automático
+@app.route('/api/datos')
+def api_datos():
+    if 'user' not in session:
+        return jsonify({"error": "No autorizado"}), 401
+
+    datos = {}
+    for clave, file_id in CSV_IDS.items():
+        try:
+            df = descargar_csv_drive(file_id)
+            datos[clave] = obtener_valor_primera_celda(df)
+        except Exception as e:
+            datos[clave] = "Error"
+            app.logger.error(f"Error cargando {clave}: {e}")
+
+    return jsonify(datos)
 
 @app.route('/log')
 def log():
@@ -79,4 +91,3 @@ def log():
 
 if __name__ == "__main__":
     app.run()
-
