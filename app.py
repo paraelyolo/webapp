@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, redirect, session, request, url_for, jsonify
 from werkzeug.security import check_password_hash
 from utils.drive import descargar_csv_drive
@@ -7,7 +6,7 @@ import os
 import pandas as pd
 
 app = Flask(__name__)
-app.secret_key = 'superclave'  # Cámbiala por una clave fuerte en producción
+app.secret_key = 'superclave'  # Reemplaza con algo más fuerte en producción
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USERS_FILE = os.path.join(BASE_DIR, 'users.json')
@@ -46,7 +45,6 @@ def do_login():
     if user and check_password_hash(user['password'], password):
         session['user'] = username
         return redirect(url_for('dashboard'))
-
     return "Login incorrecto", 401
 
 @app.route('/dashboard')
@@ -57,20 +55,15 @@ def dashboard():
     datos = {}
     errores = []
     for clave in ["operador", "horas_trabajo", "piezas_cortadas", "tipo_perfil"]:
-        file_id = CSV_IDS[clave]
         try:
-            df = descargar_csv_drive(file_id)
-            app.logger.info(f"Contenido CSV para {clave}: \n{df}")
+            df = descargar_csv_drive(CSV_IDS[clave])
             datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
-            error_msg = f"Error en '{clave}': {str(e)}"
-            errores.append(error_msg)
-            app.logger.error(error_msg)
+            app.logger.error(f"Error al obtener {clave}: {e}")
+            datos[clave] = "Error"
+            errores.append(str(e))
 
-    if errores:
-        return "Errores detectados:<br>" + "<br>".join(errores), 500
-
-    return render_template('dashboard.html', datos=datos)
+    return render_template("dashboard.html", datos=datos)
 
 @app.route('/api/datos')
 def api_datos():
@@ -79,14 +72,12 @@ def api_datos():
 
     datos = {}
     for clave in ["operador", "horas_trabajo", "piezas_cortadas", "tipo_perfil"]:
-        file_id = CSV_IDS[clave]
         try:
-            df = descargar_csv_drive(file_id)
+            df = descargar_csv_drive(CSV_IDS[clave])
             datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
-            app.logger.error(f"Error al obtener {clave}: {e}")
+            app.logger.error(f"Error en API {clave}: {e}")
             datos[clave] = "Error"
-
     return jsonify(datos)
 
 @app.route('/log')
@@ -103,7 +94,7 @@ def log():
         registros = []
         columnas = []
 
-    return render_template('log.html', registros=registros, columnas=columnas)
+    return render_template("log.html", registros=registros, columnas=columnas)
 
 @app.route('/api/log')
 def api_log():
@@ -111,15 +102,14 @@ def api_log():
         return jsonify({"error": "No autorizado"}), 401
 
     try:
-        df = descargar_csv_drive(CSV_IDS["log"])
-        if df.empty:
-            return jsonify({"registros": [], "columnas": []})
-        columnas = df.columns.tolist()
-        registros = df.to_dict(orient='records')
+        df_log = descargar_csv_drive(CSV_IDS["log"])
+        registros = df_log.to_dict(orient='records')
+        columnas = df_log.columns.tolist() if not df_log.empty else []
         return jsonify({"registros": registros, "columnas": columnas})
     except Exception as e:
-        app.logger.error(f"Error al cargar log: {e}")
-        return jsonify({"error": "Error al cargar log"}), 500
+        app.logger.error(f"Error en API /api/log: {e}")
+        return jsonify({"error": "No se pudo cargar el log"}), 500
 
 if __name__ == "__main__":
     app.run()
+
