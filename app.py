@@ -18,6 +18,11 @@ CSV_IDS = {
     "tipo_perfil": "1Q6mnuyx80XRIohbxVu4cgimRyZP3J85A"
 }
 
+def obtener_valor_primera_celda(df):
+    if df.empty:
+        return "Sin datos"
+    return df.iloc[0, 0]
+
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -49,8 +54,9 @@ def dashboard():
     errores = []
     for clave, file_id in CSV_IDS.items():
         try:
-            valor = descargar_csv_drive(file_id).iloc[0, 0]
-            datos[clave] = valor
+            df = descargar_csv_drive(file_id)
+            app.logger.info(f"Contenido CSV para {clave}: \n{df}")
+            datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
             error_msg = f"Error en '{clave}': {str(e)}"
             errores.append(error_msg)
