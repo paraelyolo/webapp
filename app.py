@@ -41,7 +41,7 @@ def do_login():
     if user and check_password_hash(user['password'], password):
         session['user'] = username
         return redirect(url_for('dashboard'))
-    
+
     return "Login incorrecto", 401
 
 @app.route('/dashboard')
@@ -66,7 +66,6 @@ def dashboard():
 
     return render_template('dashboard.html', datos=datos)
 
-# ✅ Nuevo endpoint para refresco automático
 @app.route('/api/datos')
 def api_datos():
     if 'user' not in session:
@@ -78,8 +77,8 @@ def api_datos():
             df = descargar_csv_drive(file_id)
             datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
+            app.logger.error(f"Error al obtener {clave}: {e}")
             datos[clave] = "Error"
-            app.logger.error(f"Error cargando {clave}: {e}")
 
     return jsonify(datos)
 
