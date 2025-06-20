@@ -33,27 +33,37 @@
         .value {
             color: #555;
         }
+        .error {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>Máquina 1</h2>
-        <div class="row">
-            <div class="label">Operador:</div>
-            <div class="value">{{ datos.operador }}</div>
-        </div>
-        <div class="row">
-            <div class="label">Horas de trabajo:</div>
-            <div class="value">{{ datos.horas_trabajo }}</div>
-        </div>
-        <div class="row">
-            <div class="label">Piezas cortadas:</div>
-            <div class="value">{{ datos.piezas_cortadas }}</div>
-        </div>
-        <div class="row">
-            <div class="label">Tipo de perfil:</div>
-            <div class="value">{{ datos.tipo_perfil }}</div>
-        </div>
+
+        {% if datos %}
+            <div class="row">
+                <div class="label">Operador:</div>
+                <div class="value">{{ datos.operador }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Horas de trabajo:</div>
+                <div class="value">{{ datos.horas_trabajo }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Piezas cortadas:</div>
+                <div class="value">{{ datos.piezas_cortadas }}</div>
+            </div>
+            <div class="row">
+                <div class="label">Tipo de perfil:</div>
+                <div class="value">{{ datos.tipo_perfil }}</div>
+            </div>
+        {% else %}
+            <div class="error">No se pudieron cargar los datos del dashboard.</div>
+        {% endif %}
 
         <!-- ✅ BOTÓN LOG -->
         <div style="text-align: center; margin-top: 20px;">
@@ -64,4 +74,3 @@
     </div>
 </body>
 </html>
-
