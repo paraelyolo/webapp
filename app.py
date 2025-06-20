@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash
 from utils.drive import descargar_csv_drive
 import json
 import os
+import pandas as pd
 
 app = Flask(__name__)
 app.secret_key = 'superclave'  # cámbiala por una clave fuerte en producción
@@ -20,7 +21,10 @@ CSV_IDS = {
 def obtener_valor_primera_celda(df):
     if df.empty:
         return "Sin datos"
-    return df.iloc[0, 0]
+    valor = df.iloc[0, 0]
+    if pd.isna(valor):
+        return "Sin datos"
+    return str(valor)
 
 @app.route('/')
 def login():
@@ -75,9 +79,10 @@ def api_datos():
     for clave, file_id in CSV_IDS.items():
         try:
             df = descargar_csv_drive(file_id)
+            print(f"[API] CSV descargado para {clave}:\n{df}")
             datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
-            app.logger.error(f"Error al obtener {clave}: {e}")
+            print(f"[API] Error en '{clave}': {e}")
             datos[clave] = "Error"
 
     return jsonify(datos)
