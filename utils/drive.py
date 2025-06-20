@@ -1,13 +1,31 @@
-# utils/drive.py
-
-import pandas as pd
 import requests
+import pandas as pd
 from io import StringIO
 
 def descargar_csv_drive(file_id):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise Exception("No se pudo descargar el archivo.")
-    return pd.read_csv(StringIO(response.text))
+    """
+    Descarga un CSV desde Google Drive y lo convierte a DataFrame de pandas,
+    manejando la confirmación automática para archivos grandes.
+    """
+    URL = "https://docs.google.com/uc?export=download"
 
+    session = requests.Session()
+
+    response = session.get(URL, params={'id': file_id}, stream=True)
+    token = _get_confirm_token(response)
+
+    if token:
+        params = {'id': file_id, 'confirm': token}
+        response = session.get(URL, params=params, stream=True)
+
+    content = response.content.decode('utf-8')
+    return pd.read_csv(StringIO(content))
+
+def _get_confirm_token(response):
+    """
+    Extrae el token de confirmación necesario para la descarga.
+    """
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+    return None
