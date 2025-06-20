@@ -15,7 +15,8 @@ CSV_IDS = {
     "operador": "1uIgigavolkY6xdWKw1DCEGmfsBD_wzn6",
     "horas_trabajo": "152IQbofX1hAKODLmOU8HJErDHW142hNH",
     "piezas_cortadas": "1EkZoRWAlvOMm9ED4cQJgmhAA_VAwOPi4",
-    "tipo_perfil": "1Q6mnuyx80XRIohbxVu4cgimRyZP3J85A"
+    "tipo_perfil": "1Q6mnuyx80XRIohbxVu4cgimRyZP3J85A",
+    "log": "1S7IvflfqXJURLwicx_wZUqpAP4opfht5"  # ✅ Nuevo ID de log
 }
 
 def obtener_valor_primera_celda(df):
@@ -55,7 +56,8 @@ def dashboard():
 
     datos = {}
     errores = []
-    for clave, file_id in CSV_IDS.items():
+    for clave in ["operador", "horas_trabajo", "piezas_cortadas", "tipo_perfil"]:
+        file_id = CSV_IDS[clave]
         try:
             df = descargar_csv_drive(file_id)
             app.logger.info(f"Contenido CSV para {clave}: \n{df}")
@@ -76,13 +78,13 @@ def api_datos():
         return jsonify({"error": "No autorizado"}), 401
 
     datos = {}
-    for clave, file_id in CSV_IDS.items():
+    for clave in ["operador", "horas_trabajo", "piezas_cortadas", "tipo_perfil"]:
+        file_id = CSV_IDS[clave]
         try:
             df = descargar_csv_drive(file_id)
-            print(f"[API] CSV descargado para {clave}:\n{df}")
             datos[clave] = obtener_valor_primera_celda(df)
         except Exception as e:
-            print(f"[API] Error en '{clave}': {e}")
+            app.logger.error(f"Error al obtener {clave}: {e}")
             datos[clave] = "Error"
 
     return jsonify(datos)
@@ -91,7 +93,15 @@ def api_datos():
 def log():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template('log.html')
+
+    try:
+        df_log = descargar_csv_drive(CSV_IDS["log"])
+        registros = df_log.to_dict(orient='records')
+    except Exception as e:
+        app.logger.error(f"Error al cargar el log: {e}")
+        registros = []
+
+    return render_template('log.html', registros=registros, columnas=df_log.columns if not df_log.empty else [])
 
 if __name__ == "__main__":
     app.run()
