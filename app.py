@@ -46,13 +46,18 @@ def dashboard():
         return redirect(url_for('login'))
 
     datos = {}
-    try:
-        datos["operador"] = descargar_csv_drive(CSV_IDS["operador"]).iloc[0, 0]
-        datos["horas_trabajo"] = descargar_csv_drive(CSV_IDS["horas_trabajo"]).iloc[0, 0]
-        datos["piezas_cortadas"] = descargar_csv_drive(CSV_IDS["piezas_cortadas"]).iloc[0, 0]
-        datos["tipo_perfil"] = descargar_csv_drive(CSV_IDS["tipo_perfil"]).iloc[0, 0]
-    except Exception as e:
-        return f"Error cargando datos del dashboard: {str(e)}", 500
+    errores = []
+    for clave, file_id in CSV_IDS.items():
+        try:
+            valor = descargar_csv_drive(file_id).iloc[0, 0]
+            datos[clave] = valor
+        except Exception as e:
+            error_msg = f"Error en '{clave}': {str(e)}"
+            errores.append(error_msg)
+            app.logger.error(error_msg)
+
+    if errores:
+        return "Errores detectados:<br>" + "<br>".join(errores), 500
 
     return render_template('dashboard.html', datos=datos)
 
