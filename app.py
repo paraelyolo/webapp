@@ -30,8 +30,8 @@ def do_login():
     try:
         with open(USERS_FILE) as f:
             users = json.load(f)
-    except Exception:
-        return "Error leyendo archivo de usuarios.", 500
+    except Exception as e:
+        return f"Error leyendo archivo de usuarios: {e}", 500
 
     user = users.get(username)
     if user and check_password_hash(user['password'], password):
@@ -64,4 +64,3 @@ def log():
 
 if __name__ == "__main__":
     app.run()
-
