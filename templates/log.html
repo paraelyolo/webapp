@@ -1,17 +1,98 @@
 <!DOCTYPE html>
-<html>
-<head><title>Log</title></head>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Actividad</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f4;
+            padding: 40px;
+        }
+        .container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 90%;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+        }
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .volver-btn {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .volver-btn a {
+            text-decoration: none;
+        }
+        .volver-btn button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .volver-btn button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
 <body>
-    <h1>Log</h1>
-    <table border="1">
-        <thead>
-            <tr>{% for col in columnas %}<th>{{ col }}</th>{% endfor %}</tr>
-        </thead>
-        <tbody>
-            {% for fila in registros %}
-            <tr>{% for col in columnas %}<td>{{ fila[col] }}</td>{% endfor %}</tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="container">
+        <h2>Registro de Actividad (LOG)</h2>
+
+        {% if registros %}
+        <table>
+            <thead>
+                <tr>
+                    {% for col in columnas %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in registros %}
+                <tr>
+                    {% for col in columnas %}
+                    <td>{{ fila[col] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="text-align: center;">No hay registros para mostrar.</p>
+        {% endif %}
+
+        <div class="volver-btn">
+            <a href="{{ url_for('dashboard.dashboard') }}">
+                <button>Volver al Dashboard</button>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
