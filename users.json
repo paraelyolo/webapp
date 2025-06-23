@@ -1,6 +1,9 @@
 {
-    "juan": {
-        "password": "scrypt:32768:8:1$mLgJNacSzG2jpLlr$268ea4f9063bea51b7e067c84dceebc78487550490d606b983377ce549d6eab94cb809bf777b452a90cc53aca6b5eabde810dc2d8b4599dbf7f43fa8f63e41c6",
-        "carpeta_drive": "1_ZCJUYl19bbH-GieC5q5q3eLt9mBwCgx"
+    "admin": {
+        "password": "scrypt:32768:8:1$42sRsYc751M1kRSa$b0f6a34a8d0ff0ea21fc3fa4494f3bf55f01054a1db36edf49c83ec401abfea644e4a7b874c7bd1ce352eef25885cdab878d7b28853229d22130d2a090e37e76"
+    },
+    "panfilo": {
+        "password": "scrypt:32768:8:1$d1sY8mK5lCzwUMxi$92cc8b4c456291997d1aa71a87e8f31459113280574e7d6531e41d627c783bb6ea1fd9f82f00aaa20a0e10129074f85f6ac88ece0e2429e501cc2afbe5f656da",
+        "carpeta_drive": "1LaGcaQzGe_EKKNvQk0iplYkU8CBN4Xus"
     }
 }
