@@ -1,12 +1,113 @@
 <!DOCTYPE html>
-<html>
-<head><title>Dashboard</title></head>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f4;
+            padding: 40px;
+        }
+        .box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+        .value {
+            color: #555;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .log-button {
+            text-align: center;
+            margin-top: 25px;
+        }
+        .log-button a {
+            text-decoration: none;
+        }
+        .log-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .log-button button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
 <body>
-    <h1>Dashboard</h1>
-    <ul>
-        {% for clave, valor in datos.items() %}
-        <li><strong>{{ clave }}:</strong> {{ valor }}</li>
-        {% endfor %}
-    </ul>
+    <div class="box">
+        <h2>Dashboard - Máquina 1</h2>
+
+        <div class="row">
+            <div class="label">Operador:</div>
+            <div class="value" id="operador">{{ datos.operador }}</div>
+        </div>
+        <div class="row">
+            <div class="label">Horas de trabajo:</div>
+            <div class="value" id="horas_trabajo">{{ datos.horas_trabajo }}</div>
+        </div>
+        <div class="row">
+            <div class="label">Piezas cortadas:</div>
+            <div class="value" id="piezas_cortadas">{{ datos.piezas_cortadas }}</div>
+        </div>
+        <div class="row">
+            <div class="label">Tipo de perfil:</div>
+            <div class="value" id="tipo_perfil">{{ datos.tipo_perfil }}</div>
+        </div>
+
+        <div class="log-button">
+            <a href="{{ url_for('log.log_view') }}">
+                <button>Ir al LOG</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 🔁 Refresca automáticamente los valores cada 15 segundos
+        setInterval(() => {
+            fetch("/api/datos")
+                .then(response => {
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) return;
+
+                    document.getElementById("operador").innerText = data.operador;
+                    document.getElementById("horas_trabajo").innerText = data.horas_trabajo;
+                    document.getElementById("piezas_cortadas").innerText = data.piezas_cortadas;
+                    document.getElementById("tipo_perfil").innerText = data.tipo_perfil;
+                })
+                .catch(err => {
+                    console.error("Error actualizando:", err);
+                });
+        }, 15000);
+    </script>
 </body>
 </html>
